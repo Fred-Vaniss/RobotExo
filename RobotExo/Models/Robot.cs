@@ -9,7 +9,7 @@ namespace RobotExo.Models
     public delegate void OrdreDelegate();
 
     public enum Directions { North, East, South, West }
-    public enum OrdreRobot { Avancer, Gauche, Droite }
+    public enum OrdreRobot { Avancer, Gauche, Droite, Check }
 
     public class Robot
     {
@@ -129,7 +129,6 @@ namespace RobotExo.Models
 
         public void Avancer()
         {
-            RobotEvent.Invoke(this, new RobotEventArgs($"Le se dirige vers {DirectionStr}: {PosX},{PosY}", MessageType.Info));
             switch (Direction)
             {
                 case Directions.North:
@@ -145,6 +144,8 @@ namespace RobotExo.Models
                     PosX --;
                     break;
             }
+
+            RobotEvent.Invoke(this, new RobotEventArgs($"Le se dirige vers {DirectionStr}: {PosX},{PosY}", MessageType.Info));
         }
 
         public void TournerGauche()
@@ -159,6 +160,14 @@ namespace RobotExo.Models
             RobotEvent.Invoke(this, new RobotEventArgs($"Le robot tourne à droite: {DirectionStr}", MessageType.Info));
         }
 
+        public void CheckVictory()
+        {
+            if (Grid.CheckVictory(this))
+                RobotEvent.Invoke(this, new RobotEventArgs($"🎉 Le robot à atteint le point final. 🥳", MessageType.Victoire));
+            else
+                RobotEvent.Invoke(this, new RobotEventArgs($"Le robot n'a pas atteint le point final.", MessageType.Erreur));
+        }
+
         public void EnregistrerOrdre(OrdreRobot ordreRobot)
         {
             switch(ordreRobot)
@@ -171,6 +180,9 @@ namespace RobotExo.Models
                     break;
                 case OrdreRobot.Gauche:
                     Ordres += TournerGauche;
+                    break;
+                case OrdreRobot.Check:
+                    Ordres += CheckVictory;
                     break;
             }
 
@@ -188,9 +200,6 @@ namespace RobotExo.Models
             {
                 throw new InvalidOperationException("Le robot n'a aucune ordre enregistré");
             }
-
-            if (Grid.CheckVictory(this))
-                RobotEvent.Invoke(this, new RobotEventArgs($"🎉 Le robot à atteint le point final. 🥳", MessageType.Victoire));
         }
     }
 }

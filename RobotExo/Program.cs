@@ -1,6 +1,7 @@
 ﻿using RobotExo.Models;
+using System.Security.Cryptography;
 
-namespace exo_bonus_samuel
+namespace RobotExo
 {
     internal class Program
     {
@@ -8,42 +9,56 @@ namespace exo_bonus_samuel
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
+            Grid grille = new Grid(5, 5);
+            Robot robot = new Robot(grille, RobotUI.AfficherMessage);
 
-            Grid grille = new Grid(15, 15);
-            Robot robot = new Robot(grille, RobotMessage);
+            grille.InitGame(3, 4);
 
+            //Console.WriteLine($"Initialisé la grille, le point final se strouve sur {grille.FinalX},{grille.FinalY}");
 
-            grille.InitGame(3, 9);
-
-            Console.WriteLine($"Initialisé la grille, le point final se strouve sur {grille.FinalX},{grille.FinalY}");
-
-            robot.EnregistrerOrdre(OrdreRobot.Droite);
-            robot.EnregistrerOrdre(OrdreRobot.Droite);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Gauche);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Droite);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-            robot.EnregistrerOrdre(OrdreRobot.Avancer);
-
+            //robot.EnregistrerOrdre(OrdreRobot.Droite);
+            //robot.EnregistrerOrdre(OrdreRobot.Droite);
             //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Gauche);
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Droite);
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+            //robot.EnregistrerOrdre(OrdreRobot.Check);
 
-            Console.WriteLine("===============================================");
+            ////robot.EnregistrerOrdre(OrdreRobot.Avancer);
 
-            robot.Executer();
+            //Console.WriteLine("===============================================");
+
+            //robot.Executer();
+
+            RobotUI.MenuRobot(robot);
         }
 
-        static void RobotMessage(Robot r, RobotEventArgs args)
+        static void OnRobotEvent(Robot r, RobotEventArgs args)
         {
+            switch (args.MessageType)
+            {
+                case MessageType.Info:
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    break;
+
+                case MessageType.Erreur:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+
+                case MessageType.Victoire:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+
+            }
+
             Console.WriteLine($"{args.MessageType}: {args.Message}");
+
+            Console.ResetColor();
         }
     }
 }
