@@ -10,7 +10,8 @@ namespace exo_bonus_samuel
 
 
             Grid grille = new Grid(15, 15);
-            Robot robot = new Robot(grille);
+            Robot robot = new Robot(grille, RobotMessage);
+
 
             grille.InitGame(3, 9);
 
@@ -33,7 +34,16 @@ namespace exo_bonus_samuel
             robot.EnregistrerOrdre(OrdreRobot.Avancer);
             robot.EnregistrerOrdre(OrdreRobot.Avancer);
 
+            //robot.EnregistrerOrdre(OrdreRobot.Avancer);
+
+            Console.WriteLine("===============================================");
+
             robot.Executer();
+        }
+
+        static void RobotMessage(Robot r, RobotEventArgs args)
+        {
+            Console.WriteLine($"{args.MessageType}: {args.Message}");
         }
     }
 }

@@ -9,13 +9,40 @@ namespace RobotExo.Models
     public class Grid
     {
         #region propriétés
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-
         public int FinalX { get; private set; }
         public int FinalY { get; private set; }
 
         public Robot? Robot {  get; set; }
+
+        #endregion
+
+        #region propriétés décomposé
+        private int _width;
+        private int _height;
+        public int Width
+        {
+            get { return _width; }
+
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(Width), value, "Largeur inférieur à zéro.");
+
+                _width = value;
+            }
+        }
+
+        public int Height
+        {
+            get { return _height;}
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(Height), value, "Hauteur inférieur à zéro.");
+
+                _height = value;
+            }
+        }
 
         #endregion
 
@@ -50,6 +77,14 @@ namespace RobotExo.Models
             FinalY = fY;
 
             Robot.Reset();
+        }
+
+        public bool CheckVictory(Robot r)
+        {
+            if (r.PosX == FinalX && r.PosY == FinalY)
+                return true;
+            else
+                return false;
         }
         #endregion
     }

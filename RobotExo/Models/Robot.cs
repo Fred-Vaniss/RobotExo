@@ -8,7 +8,7 @@ namespace RobotExo.Models
 {
     public delegate void OrdreDelegate();
 
-    public enum DirectionEnum { North, East, South, West }
+    public enum Directions { North, East, South, West }
     public enum OrdreRobot { Avancer, Gauche, Droite }
 
     public class Robot
@@ -18,17 +18,20 @@ namespace RobotExo.Models
 
         private int _PosX;
         private int _PosY;
-        private DirectionEnum _Direction;
+        private Directions _Direction;
+        public Action<Robot, RobotEventArgs> RobotEvent { get; set; }
 
         public Grid Grid { get; private set; }
         #endregion
 
         #region constructeur
-        public Robot(Grid g)
+        public Robot(Grid g, Action<Robot, RobotEventArgs> method)
         {
             Grid = g;
 
             g.Robot = this;
+
+            RobotEvent = method;
         }
         #endregion
 
@@ -42,7 +45,8 @@ namespace RobotExo.Models
 
                 if (value < 0 || value > Grid.Width)
                 {
-                    throw new InvalidOperationException("Le robot à atteint la limite de la grille");
+                    RobotEvent.Invoke(this, new RobotEventArgs($"*Boink*, le robot touche un mur ({DirectionStr} : {PosX},{PosY})", MessageType.Erreur));
+                    //throw new ArgumentOutOfRangeException(nameof(PosX), value, $"La position dépasse la valeur authorisée (0, {Grid.Width})");
                 }
                 else
                 {
@@ -52,39 +56,64 @@ namespace RobotExo.Models
         }
 
         public int PosY
-        { 
+        {
             get { return _PosY; }
-            set 
+            set
             {
 
                 if (value < 0 || value > Grid.Height)
                 {
-                    throw new InvalidOperationException("Le robot à atteint la limite de la grille");
+                    RobotEvent.Invoke(this,new RobotEventArgs($"*Boink*, le robot touche un mur ({DirectionStr} : {PosX},{PosY})", MessageType.Erreur));
+                    //throw new ArgumentOutOfRangeException(nameof(PosY), value, $"La position dépasse la valeur authorisée (0, {Grid.Height})");
                 }
-                else 
+                else
                 {
                     _PosY = value;
                 }
             }
         }
 
-        public DirectionEnum Direction
+        public Directions Direction
         {
             get { return _Direction; }
             set
-            { 
+            {
 
-                if ( (int)value > 3 )
+                if ((int)value > 3)
                 {
-                    _Direction = DirectionEnum.North;
+                    _Direction = Directions.North;
                 }
-                else if ( (int)value < 0 )
+                else if ((int)value < 0)
                 {
-                    _Direction = DirectionEnum.West;
+                    _Direction = Directions.West;
                 }
                 else
                 {
                     _Direction = value;
+                }
+            }
+        }
+
+        public string DirectionStr
+        {
+            get
+            {
+                switch (_Direction)
+                {
+                    case Directions.North:
+                        return "↑";
+
+                    case Directions.East:
+                        return "→";
+
+                    case Directions.South:
+                        return "↓";
+
+                    case Directions.West:
+                        return "←";
+
+                    default:
+                        return "";
                 }
             }
         }
@@ -96,64 +125,38 @@ namespace RobotExo.Models
             PosX = 0;
             PosY = 0;
 
-            Status();
         }
 
         public void Avancer()
         {
-
+            RobotEvent.Invoke(this, new RobotEventArgs($"Le se dirige vers {DirectionStr}: {PosX},{PosY}", MessageType.Info));
             switch (Direction)
             {
-                case DirectionEnum.North:
-                    PosY -= 1;
+                case Directions.North:
+                    PosY --;
                     break;
-                case DirectionEnum.East:
-                    PosX += 1;
+                case Directions.East:
+                    PosX ++;
                     break;
-                case DirectionEnum.South:
-                    PosY += 1;
+                case Directions.South:
+                    PosY ++;
                     break;
-                case DirectionEnum.West:
-                    PosX -= 1;
+                case Directions.West:
+                    PosX --;
                     break;
             }
-
-            Status();
         }
 
         public void TournerGauche()
         {
             Direction -= 1;
-            Status();
+            RobotEvent.Invoke(this, new RobotEventArgs($"Le robot tourne à gauche: {DirectionStr}", MessageType.Info));
         }
 
         public void TournerDroite()
         {
             Direction += 1;
-            Status();
-        }
-
-        private void Status()
-        {
-            string direction = string.Empty;
-
-            switch (Direction)
-            {
-                case DirectionEnum.North:
-                    direction = "↑";
-                    break;
-                case DirectionEnum.East:
-                    direction = "→";
-                    break;
-                case DirectionEnum.South:
-                    direction = "↓";
-                    break;
-                case DirectionEnum.West:
-                    direction = "←";
-                    break;
-            }
-
-            Console.WriteLine($"Le robot se situe à {PosX},{PosY}; direction: {direction}");
+            RobotEvent.Invoke(this, new RobotEventArgs($"Le robot tourne à droite: {DirectionStr}", MessageType.Info));
         }
 
         public void EnregistrerOrdre(OrdreRobot ordreRobot)
@@ -170,16 +173,24 @@ namespace RobotExo.Models
                     Ordres += TournerGauche;
                     break;
             }
+
+            RobotEvent.Invoke(this, new RobotEventArgs($"Nouvelle ordre enregistré: {ordreRobot}", MessageType.Info));
         }
 
         public void Executer()
         {
             if (Ordres != null)
+            {
+                RobotEvent.Invoke(this, new RobotEventArgs($"Exécution des ordres du robot", MessageType.Info));
                 Ordres();
+            }
             else
             {
                 throw new InvalidOperationException("Le robot n'a aucune ordre enregistré");
             }
+
+            if (Grid.CheckVictory(this))
+                RobotEvent.Invoke(this, new RobotEventArgs($"🎉 Le robot à atteint le point final. 🥳", MessageType.Victoire));
         }
     }
 }
