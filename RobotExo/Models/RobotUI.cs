@@ -87,6 +87,10 @@ namespace RobotExo.Models
                         {
                             line += "║";
                         }
+                        else if ((i == r.PosY && j == r.PosX) && (i == g.FinalY && j == g.FinalX))
+                        {
+                            line += "✓";
+                        }
                         else if (i == g.FinalY && j ==  g.FinalX)
                         {
                             line += "X";
@@ -214,9 +218,8 @@ namespace RobotExo.Models
         public static void MenuRobot(Robot r)
         {
             int choice = 0;
-            string input = string.Empty;
 
-            do
+            while(true)
             {
                 RefreshGrille(r);
 
@@ -225,7 +228,7 @@ namespace RobotExo.Models
                 Console.WriteLine("2: Planifier le robot (difficile)");
                 Console.WriteLine("3: Ré-initialiser la partie");
                 Console.WriteLine("0: Quitter le programme");
-                input = Console.ReadLine();
+                string? input = Console.ReadLine();
 
                 if(!int.TryParse(input, out choice))
                 {
@@ -259,8 +262,6 @@ namespace RobotExo.Models
                     }
                 }
             }
-            while (true);
-
         }
     }
 }

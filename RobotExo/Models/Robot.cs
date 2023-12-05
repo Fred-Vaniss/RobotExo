@@ -154,13 +154,13 @@ namespace RobotExo.Models
 
         public void TournerGauche()
         {
-            Direction -= 1;
+            Direction--;
             RobotEvent.Invoke(this, new RobotEventArgs($"Le robot tourne à gauche: {DirectionStr}", MessageType.Info));
         }
 
         public void TournerDroite()
         {
-            Direction += 1;
+            Direction++;
             RobotEvent.Invoke(this, new RobotEventArgs($"Le robot tourne à droite: {DirectionStr}", MessageType.Info));
         }
 

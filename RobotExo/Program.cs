@@ -1,5 +1,6 @@
 ﻿using RobotExo.Models;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace RobotExo
 {
@@ -7,7 +8,7 @@ namespace RobotExo
     {
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
 
             Grid grille = new Grid(10, 10);
             Robot robot = new Robot(grille, RobotUI.AfficherMessage);
