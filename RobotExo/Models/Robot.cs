@@ -124,11 +124,14 @@ namespace RobotExo.Models
         {
             PosX = 0;
             PosY = 0;
-
+            Direction = Directions.North;
         }
 
         public void Avancer()
         {
+            int oldX = PosX;
+            int oldY = PosY;
+
             switch (Direction)
             {
                 case Directions.North:
@@ -145,7 +148,8 @@ namespace RobotExo.Models
                     break;
             }
 
-            RobotEvent.Invoke(this, new RobotEventArgs($"Le se dirige vers {DirectionStr}: {PosX},{PosY}", MessageType.Info));
+            if (oldX != PosX || oldY != PosY)
+                RobotEvent.Invoke(this, new RobotEventArgs($"Le se dirige vers {DirectionStr}: {PosX},{PosY}", MessageType.Info));
         }
 
         public void TournerGauche()
@@ -187,6 +191,13 @@ namespace RobotExo.Models
             }
 
             RobotEvent.Invoke(this, new RobotEventArgs($"Nouvelle ordre enregistré: {ordreRobot}", MessageType.Info));
+        }
+
+        public void ViderOrdres()
+        {
+            Ordres = null;
+
+            RobotEvent.Invoke(this, new RobotEventArgs("Réinitialisation des ordres du robot", MessageType.Info));
         }
 
         public void Executer()

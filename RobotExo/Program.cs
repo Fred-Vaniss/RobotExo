@@ -9,10 +9,10 @@ namespace RobotExo
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            Grid grille = new Grid(5, 5);
+            Grid grille = new Grid(10, 10);
             Robot robot = new Robot(grille, RobotUI.AfficherMessage);
 
-            grille.InitGame(3, 4);
+            grille.InitGame();
 
             //Console.WriteLine($"Initialisé la grille, le point final se strouve sur {grille.FinalX},{grille.FinalY}");
 

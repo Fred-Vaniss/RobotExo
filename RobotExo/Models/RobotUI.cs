@@ -31,7 +31,7 @@ namespace RobotExo.Models
             Console.ResetColor();
         }
 
-        public static void RefreshGrille(Robot r)
+        private static void RefreshGrille(Robot r)
         {
             Grid g = r.Grid;
 
@@ -87,11 +87,11 @@ namespace RobotExo.Models
                         {
                             line += "║";
                         }
-                        else if (i == g.FinalX && j ==  g.FinalY)
+                        else if (i == g.FinalY && j ==  g.FinalX)
                         {
                             line += "X";
                         }
-                        else if (i == r.PosX && j == r.PosY)
+                        else if (i == r.PosY && j == r.PosX)
                         {
                             line += (r.DirectionStr);
                         }
@@ -130,11 +130,13 @@ namespace RobotExo.Models
             }
         }
 
-        public static void ControleRobot(Robot r)
+        private static void ControleRobot(Robot r)
         {
             ConsoleKey key;
 
-            while(true)
+            RefreshGrille(r);
+
+            while (true)
             {
                 Console.WriteLine("Choisissez une direction où aller. Arrière pour stopper.");
                 key = Console.ReadKey(true).Key;
@@ -142,20 +144,72 @@ namespace RobotExo.Models
                 switch(key)
                 {
                     case ConsoleKey.UpArrow:
+                        Console.Clear();
                         r.Avancer();
                         break;
                     case ConsoleKey.LeftArrow:
+                        Console.Clear();
                         r.TournerGauche();
                         break;
                     case ConsoleKey.RightArrow:
+                        Console.Clear();
                         r.TournerDroite();
                         break;
                     case ConsoleKey.DownArrow:
+                        Console.Clear();
+                        r.CheckVictory();
                         return;
+                    default:
+                        Console.Clear();
+                        AfficherMessage(r, new RobotEventArgs("Commande invalid", MessageType.Erreur));
+                        break;
                 }
-
+                RefreshGrille(r);
             }
         }
+
+        private static void PlanifierRobot(Robot r)
+        {
+            ConsoleKey key;
+
+            r.ViderOrdres();
+
+            RefreshGrille(r);
+
+            while (true)
+            {
+                Console.WriteLine("Choisissez une direction où planifier le mouvement. Arrière pour exécuter la planification");
+
+                key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        Console.Clear();
+                        r.EnregistrerOrdre(OrdreRobot.Avancer);
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        Console.Clear();
+                        r.EnregistrerOrdre(OrdreRobot.Gauche);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        Console.Clear();
+                        r.EnregistrerOrdre(OrdreRobot.Droite);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        Console.Clear();
+                        r.EnregistrerOrdre(OrdreRobot.Check);
+                        r.Executer();
+                        return;
+                    default:
+                        Console.Clear();
+                        AfficherMessage(r, new RobotEventArgs("Commande invalid", MessageType.Erreur));
+                        break;
+                }
+                RefreshGrille(r);
+            }
+        }
+
 
         public static void MenuRobot(Robot r)
         {
@@ -164,28 +218,32 @@ namespace RobotExo.Models
 
             do
             {
+                RefreshGrille(r);
+
                 Console.WriteLine("Choisissez une action:");
-                Console.WriteLine("1: Déplacer le robot");
-                Console.WriteLine("2: Rafraichir la grille");
+                Console.WriteLine("1: Déplacer le robot (facile)");
+                Console.WriteLine("2: Planifier le robot (difficile)");
                 Console.WriteLine("3: Ré-initialiser la partie");
                 Console.WriteLine("0: Quitter le programme");
                 input = Console.ReadLine();
 
                 if(!int.TryParse(input, out choice))
                 {
+                    Console.Clear();
                     Console.ForegroundColor= ConsoleColor.Red;
                     Console.WriteLine("Choix invalide, veuillez ré-éssayer");
                     Console.ResetColor();
                 }
                 else
                 {
+                    Console.Clear();
                     switch (choice)
                     {
                         case 1:
                             ControleRobot(r);
                             break;
                         case 2:
-                            RefreshGrille(r);
+                            PlanifierRobot(r);
                             break;
                         case 3:
                             r.Grid.InitGame();
